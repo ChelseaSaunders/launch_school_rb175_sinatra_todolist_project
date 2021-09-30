@@ -8,19 +8,26 @@ configure do
   set :session_secret, 'secret'
 end
 
-before do
-  session[:lists] ||= []
+helpers do 
+  def list_complete?(list)
+    total_items_count(list) > 0 && items_remaining(list) == 0
+  end
+
+  def list_class(list)
+    "complete" if list_complete?(list)
+  end
+
+  def total_items_count(list)
+    list[:todos].size
+  end 
+
+  def items_remaining(list)
+    list[:todos].count { |item| item[:completed] == false }
+  end
 end
 
-helpers do 
-  def list_completed?(list)
-    return false if list[:todos].empty?
-    list[:todos].map { |item| item[:completed] == true }.all?(true)
-  end
-
-  def total_tasks_completed(list)
-    list[:todos].map { |item| item[:completed] == true }.count(false)
-  end
+before do
+  session[:lists] ||= []
 end
 
 get "/" do
