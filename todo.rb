@@ -24,6 +24,52 @@ helpers do
   def items_remaining(list)
     list[:todos].count { |item| item[:completed] == false }
   end
+
+  def display_list(list, index)
+    "<li class='#{list_class(list)}'>
+      <a href='/lists/#{index}'>
+        <h2>#{list[:name]}</h2>
+        <p><#{items_remaining(list)}/#{total_items_count(list)}</p>
+      </a>
+    </li>"
+  end
+
+  def organize_list_display(lists)
+    lists.each_with_index do |list, index|
+      display_list(list, index) if !list_complete?(list)
+    end
+    
+    lists.each_with_index do |list, index|
+      display_list(list, index) if list_complete?(list)
+    end
+  end
+
+  def display_list_items(item, item_id)
+    if item[:completed]
+      "<li class='complete'>"
+    else
+      "<li>"
+    end
+      "<form action='/lists/#{@list_id}/todos/#{item_id}>' method='post' class='check'>
+        <input type='hidden' name='completed' value='#{!item[:completed]}' />
+        <button type='submit'>Complete</button>
+      </form>
+      <h3>#{item[:name]}</h3>
+      <form action='/lists/#{@list_id}/todos/#{item_id}/delete' method='post' class='delete'>
+        <button type='submit'>Delete</button>
+      </form>
+    </li>" 
+  end
+
+  def organize_list_items_display(list)
+    list[:todos].each_with_index do |item, item_id|
+      display_list_items(item, item_id) if !item[:completed]
+    end
+    
+    list[:todos].each_with_index do |item, item_id|
+      display_list_items(item, item_id) if item[:completed]
+    end
+  end
 end
 
 before do
