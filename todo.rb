@@ -13,8 +13,13 @@ before do
 end
 
 helpers do 
-  def determine_checkbox_class(completed)
-    completed ? "<li class='complete'>" : "<li>"
+  def list_completed?(list)
+    return false if list[:todos].empty?
+    list[:todos].map { |item| item[:completed] == true }.all?(true)
+  end
+
+  def total_tasks_completed(list)
+    list[:todos].map { |item| item[:completed] == true }.count(false)
   end
 end
 
