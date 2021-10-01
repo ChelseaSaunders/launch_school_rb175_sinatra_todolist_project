@@ -12,7 +12,12 @@
   </header>
 
   <ul>
-    <% organize_list_items_display(@list) %>
+  <% @list[:todos].each_with_index do |item, item_id| %>
+    <%= display_list_items(item, item_id) if !item[:completed] %>
+  <% end %>
+  <% @list[:todos].each_with_index do |item, item_id| %>
+    <%= display_list_items(item, item_id) if item[:completed] %>
+  <% end %>
   </ul>
 </section>
 

@@ -29,7 +29,7 @@ helpers do
     "<li class='#{list_class(list)}'>
       <a href='/lists/#{index}'>
         <h2>#{list[:name]}</h2>
-        <p><#{items_remaining(list)}/#{total_items_count(list)}</p>
+        <p>#{items_remaining(list)}/#{total_items_count(list)}</p>
       </a>
     </li>"
   end
@@ -45,12 +45,10 @@ helpers do
   end
 
   def display_list_items(item, item_id)
-    if item[:completed]
-      "<li class='complete'>"
-    else
-      "<li>"
-    end
-      "<form action='/lists/#{@list_id}/todos/#{item_id}>' method='post' class='check'>
+    li_class_type = item[:completed] ? "<li class='complete'>" : "<li>"
+
+    "#{li_class_type}
+      <form action='/lists/#{@list_id}/todos/#{item_id}>' method='post' class='check'>
         <input type='hidden' name='completed' value='#{!item[:completed]}' />
         <button type='submit'>Complete</button>
       </form>
@@ -59,16 +57,6 @@ helpers do
         <button type='submit'>Delete</button>
       </form>
     </li>" 
-  end
-
-  def organize_list_items_display(list)
-    list[:todos].each_with_index do |item, item_id|
-      display_list_items(item, item_id) if !item[:completed]
-    end
-    
-    list[:todos].each_with_index do |item, item_id|
-      display_list_items(item, item_id) if item[:completed]
-    end
   end
 end
 
