@@ -25,38 +25,18 @@ helpers do
     list[:todos].count { |item| item[:completed] == false }
   end
 
-  def display_list(list, index)
-    "<li class='#{list_class(list)}'>
-      <a href='/lists/#{index}'>
-        <h2>#{list[:name]}</h2>
-        <p>#{items_remaining(list)}/#{total_items_count(list)}</p>
-      </a>
-    </li>"
+  def sort_lists(lists, &block)
+    complete, incomplete = lists.partition { |list| list_complete?(list) }
+
+    incomplete.each { |list| yield list, lists.index(list) }
+    complete.each { |list| yield list, lists.index(list) }
   end
 
-  def organize_list_display(lists)
-    lists.each_with_index do |list, index|
-      display_list(list, index) if !list_complete?(list)
-    end
-    
-    lists.each_with_index do |list, index|
-      display_list(list, index) if list_complete?(list)
-    end
-  end
+  def sort_items(list, &block)
+    complete, incomplete = list.partition { |item| item[:completed] }
 
-  def display_list_items(item, item_id)
-    li_class_type = item[:completed] ? "<li class='complete'>" : "<li>"
-
-    "#{li_class_type}
-      <form action='/lists/#{@list_id}/todos/#{item_id}>' method='post' class='check'>
-        <input type='hidden' name='completed' value='#{!item[:completed]}' />
-        <button type='submit'>Complete</button>
-      </form>
-      <h3>#{item[:name]}</h3>
-      <form action='/lists/#{@list_id}/todos/#{item_id}/delete' method='post' class='delete'>
-        <button type='submit'>Delete</button>
-      </form>
-    </li>" 
+    incomplete.each { |item| yield item, list.index(item) }
+    complete.each { |item| yield item, list.index(item) }
   end
 end
 
