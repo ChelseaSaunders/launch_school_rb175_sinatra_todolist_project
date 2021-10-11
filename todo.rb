@@ -37,8 +37,14 @@ helpers do
   def sort_items(list, &block)
     complete, incomplete = list.partition { |item| item[:completed] }
 
-    incomplete.each { |item| yield item, list.index(item) }
-    complete.each { |item| yield item, list.index(item) }
+
+    incomplete.each(&block)
+    complete.each(&block)
+  end
+
+  def next_todo_id(list_items)
+    max = list_items.map { |todo| todo[:id] }.max || 0
+    max + 1
   end
 end
 
@@ -123,7 +129,8 @@ post "/lists/:list_id/todos" do
     session[:error] = error
     erb :list, layout: :layout
   else
-    @list[:todos] << { name: text, completed: false }
+    id = next_todo_id(@list[:todos])
+    @list[:todos] << { id: id, name: text, completed: false }
     session[:success] = "List item added."
     redirect "lists/#{@list_id}"
   end
@@ -135,10 +142,15 @@ post "/lists/:list_id/todos/:todo_id/delete" do
   @list = load_list(@list_id)
 
   todo_id = params[:todo_id].to_i
-  @list[:todos].delete_at(todo_id)
-  session[:success] = "List item deleted."
+  @list[:todos].reject! { |todo| todo[:id] == todo_id }
 
-  redirect "lists/#{@list_id}"
+  if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
+    # ajax
+    status 204 # successful status, no content
+  else
+    session[:success] = "List item deleted."
+    redirect "/lists/#{@list_id}"
+  end
 end
 
 # Update list item status (complete?)
@@ -148,11 +160,14 @@ post "/lists/:list_id/todos/:todo_id" do
   todo_id = params[:todo_id].to_i
 
   is_completed = params[:completed] == "true"
+  todo = @list[:todos].find { |todo| todo[:id] == todo_id }
+  todo[:completed] = is_completed
 
-  @list[:todos][todo_id][:completed] = is_completed
-  session[:success] = "List item updated."
-  redirect "lists/#{@list_id}"
+  session[:success] = "The todo has been updated."
+  redirect "/lists/#{@list_id}"
 end
+
+
 
 # Mark all items complete for list
 post "/lists/:id/complete_all" do
@@ -193,7 +208,10 @@ end
 post "/lists/:id/delete" do
   id = params[:id].to_i
   session[:lists].delete_at(id)
-
-  session[:success] = "The list has been deleted."
-  redirect "/lists"
+  if env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
+    "/lists"
+  else
+    session[:success] = "The list has been deleted."
+    redirect "/lists"
+  end
 end

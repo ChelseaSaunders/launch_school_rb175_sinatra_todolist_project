@@ -12,18 +12,18 @@
   </header>
 
   <ul>
-    <% sort_items(@list[:todos]) do |item, item_id| %>
+    <% sort_items(@list[:todos]) do |item| %>
       <% if item[:completed] %>
         <li class="complete">
       <% else %>
         <li>
       <% end %>
-        <form action="/lists/<%= @list_id %>/todos/<%= item_id %>" method="post" class="check">
+        <form action="/lists/<%= @list_id %>/todos/<%= item[:id] %>" method="post" class="check">
           <input type="hidden" name="completed" value="<%= !item[:completed] %>" />
           <button type="submit">Complete</button>
         </form>
         <h3><%= item[:name] %></h3>
-        <form action="/lists/<%= @list_id %>/todos/<%= item_id %>/delete" method="post" class="delete">
+        <form action="/lists/<%= @list_id %>/todos/<%= item[:id] %>/delete" method="post" class="delete">
           <button type="submit">Delete</button>
         </form>
       </li>
