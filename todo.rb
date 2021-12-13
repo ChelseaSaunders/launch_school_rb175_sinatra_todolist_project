@@ -1,5 +1,5 @@
 require "sinatra"
-require "sinatra/reloader" if development?
+
 require "sinatra/content_for"
 require "tilt/erubis"
 
@@ -9,6 +9,11 @@ configure do
   enable :sessions
   set :session_secret, 'secret'
   set :erb, :escape_html => true
+end
+
+configure(:development) do
+  require "sinatra/reloader"
+  also_reload "database_persistence.rb"
 end
 
 helpers do 
@@ -164,7 +169,7 @@ post "/lists/:list_id/todos/:todo_id" do
   @list = load_list(@list_id)
   
   todo_id = params[:todo_id].to_i
-  is_completed = params[:completed] == "true"
+  is_completed = (params[:completed] == "true")
   
   @storage.update_todo_status(@list_id, todo_id, is_completed)
 
