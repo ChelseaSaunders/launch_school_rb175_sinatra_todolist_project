@@ -8,4 +8,6 @@ gem "erubis"
 
 gem "pg"
 
-gem "webrick"
+group :production do
+  gem "puma"
+end
