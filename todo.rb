@@ -224,3 +224,7 @@ end
       redirect "/lists"
     end
   end
+  
+  after do
+    @storage.disconnect
+  end
