@@ -18,7 +18,8 @@ end
 
 helpers do 
   def list_complete?(list)
-    total_items_count(list) > 0 && items_remaining(list) == 0
+    list[:todos_count] > 0 && list[:todos_remaining_count] == 0
+    #total_items_count(list) > 0 && items_remaining(list) == 0
   end
 
   def list_class(list)
@@ -224,7 +225,7 @@ end
       redirect "/lists"
     end
   end
-  
+
   after do
     @storage.disconnect
   end
