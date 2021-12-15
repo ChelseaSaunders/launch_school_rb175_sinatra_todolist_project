@@ -29,7 +29,7 @@ class DatabasePersistence
   def all_lists
     sql = <<~SQL
       SELECT list.*, 
-        COUNT(todo.id) AS todos_count
+        COUNT(todo.id) AS todos_count,
         COUNT(NULLIF(todo.completed, true)) AS todos_remaining_count
         FROM list 
         LEFT JOIN todo ON todo.list_id = list.id

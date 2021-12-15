@@ -65,7 +65,7 @@ end
 
 # View list of lists
 get "/lists" do
-  @list = @storage.all_lists
+  @lists = @storage.all_lists
   erb :lists, layout: :layout
 end
 
