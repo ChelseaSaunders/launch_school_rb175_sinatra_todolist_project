@@ -27,7 +27,12 @@ class DatabasePersistence
   end
 
   def all_lists
-    sql = "SELECT * FROM list;"
+    sql = "SELECT list.*, 
+           COUNT(todo.id) AS todos_count
+           COUNT(NULLIF(todo.completed, true)) AS todos_remaining
+           FROM list 
+           LEFT JOIN todo ON todo.list_id = list.id
+           GROUP BY list.id;"
     result = query(sql)
 
     result.map do |tuple|
